@@ -146,19 +146,10 @@ const Row3 = () => {
               rows={productData || []} // Display product data or empty if undefined
               columns={productColumns} // Use defined columns for the table
               disableColumnMenu
-              componentsProps={{
-                basePopper: {
-                  sx: {
-                    "& .MuiDataGrid-menu": {
-                      // Fix for accessibility
-                      "& .MuiPaper-root": {
-                        color: palette.grey[300],
-                      },
-                    },
-                  },
-                },
-              }}
               sx={{
+                "& .MuiDataGrid-menu .MuiPaper-root": {
+                  color: palette.grey[300],
+                },
                 "& .MuiDataGrid-virtualScroller": {
                   // Fix for scrollbar accessibility
                   "&:focus": {
