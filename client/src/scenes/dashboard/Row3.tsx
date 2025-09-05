@@ -16,36 +16,42 @@ const Row3 = () => {
   const { palette } = useTheme(); // Using the theme to access color palette
   const pieColors = [palette.primary[800], palette.primary[500]]; // Defining colors for the pie chart
 
-  // Fetching data using custom API hooks
-  const { data: kpiData } = useGetKpisQuery();
-  const { data: productData } = useGetProductsQuery();
-  const { data: transactionData } = useGetTransactionsQuery();
-
-  // Create a fetchData function for LoadingWrapper
-  const fetchData = async () => {
-    // Wait for the data to be fetched
-    if (productData) {
-      return { productData }; // Return the data once it's available
-    }
-  };
+  // Fetching data using custom API hooks with loading and error states
+  const {
+    data: kpiData,
+    isLoading: isLoadingKpis,
+    error: kpisError,
+  } = useGetKpisQuery();
+  const {
+    data: productData,
+    isLoading: isLoadingProducts,
+    error: productsError,
+  } = useGetProductsQuery();
+  const {
+    data: transactionData,
+    isLoading: isLoadingTransactions,
+    error: transactionsError,
+  } = useGetTransactionsQuery();
 
   // Memoizing pie chart data based on KPI data
   const pieChartData = useMemo(() => {
     if (kpiData) {
       const totalExpenses = kpiData[0].totalExpenses; // Getting the total expenses from the data
       // Mapping through expensesByCategory and preparing data for the pie chart
-      return Object.entries(kpiData[0].expensesByCategory).map(([key, value]) => {
-        return [
-          {
-            name: key, // Category name
-            value: value, // Expense amount for that category
-          },
-          {
-            name: `${key} of Total`, // Label for the remainder
-            value: totalExpenses - value, // Remaining amount after subtracting the category value
-          },
-        ];
-      });
+      return Object.entries(kpiData[0].expensesByCategory).map(
+        ([key, value]) => {
+          return [
+            {
+              name: key, // Category name
+              value: value, // Expense amount for that category
+            },
+            {
+              name: `${key} of Total`, // Label for the remainder
+              value: totalExpenses - value, // Remaining amount after subtracting the category value
+            },
+          ];
+        }
+      );
     }
   }, [kpiData]); // This will recalculate when kpiData changes
 
@@ -97,15 +103,14 @@ const Row3 = () => {
     },
   ];
 
-
   return (
     <>
       {/* First Dashboard Box for Product List */}
       <DashboardBox gridArea="g">
-        <LoadingWrapper fetchData={fetchData}>
+        <LoadingWrapper isLoading={isLoadingProducts} error={productsError}>
           <BoxHeader
             title="Product List" // Title for the section
-            sideText={`Products: ${productData?.length}`} // Display the count of products
+            sideText={`Products: ${productData?.length || 0}`} // Display the count of products
           />
           <Box
             mt="0.5rem" // Margin top
@@ -147,10 +152,13 @@ const Row3 = () => {
 
       {/* Second Dashboard Box for Recent Orders */}
       <DashboardBox gridArea="h">
-        <LoadingWrapper fetchData={fetchData}>
+        <LoadingWrapper
+          isLoading={isLoadingTransactions}
+          error={transactionsError}
+        >
           <BoxHeader
             title="Recent Orders" // Title for the section
-            sideText={`${transactionData?.length} latest transactions`} // Display the count of transactions
+            sideText={`${transactionData?.length || 0} latest transactions`} // Display the count of transactions
           />
           <Box
             mt="0.5rem" // Margin top
@@ -200,9 +208,9 @@ const Row3 = () => {
           overflow: "hidden", // Optional, if you want to hide overflow
         }}
       >
-        <LoadingWrapper fetchData={fetchData}>
+        <LoadingWrapper isLoading={isLoadingKpis} error={kpisError}>
           <BoxHeader title="Expense Breakdown By Category" sideText="+4%" />
-          <FlexBetween mt="0.5rem" p="0 1rem" textAlign="center" >
+          <FlexBetween mt="0.5rem" p="0 1rem" textAlign="center">
             {pieChartData?.slice(0, 3).map((data, i) => (
               <Box key={`${data[0].name}-${i}`}>
                 <PieChart width={100} height={100} margin={{ bottom: 25 }}>
@@ -230,7 +238,7 @@ const Row3 = () => {
 
       {/* Fourth Dashboard Box for Overall Summary */}
       <DashboardBox gridArea="j">
-        <LoadingWrapper fetchData={fetchData}>
+        <LoadingWrapper isLoading={isLoadingKpis} error={kpisError}>
           <BoxHeader
             title="Overall Summary and Explanation Data" // Title for the section
             sideText="+15%" // Side text with some value
@@ -249,7 +257,8 @@ const Row3 = () => {
             ></Box>
           </Box>
           <Typography margin="0 1rem" variant="h5">
-            Lorem ipsum odor amet, consectetuer adipiscing elit. {/* Placeholder text */}
+            Lorem ipsum odor amet, consectetuer adipiscing elit.{" "}
+            {/* Placeholder text */}
           </Typography>
         </LoadingWrapper>
       </DashboardBox>

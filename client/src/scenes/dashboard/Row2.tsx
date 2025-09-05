@@ -32,16 +32,16 @@ const Row2 = () => {
   const pieColors = [palette.primary[800], palette.primary[300]]; // Set colors for the pie chart slices
 
   // Fetch operational data and product data using custom API queries
-  const { data: operationalData } = useGetKpisQuery();
-  const { data: productData } = useGetProductsQuery();
-
-  // Create a fetchData function for LoadingWrapper
-  const fetchData = async () => {
-    // Wait for the data to be fetched
-    if (operationalData && productData) {
-      return { operationalData, productData }; // Return the data once it's available
-    }
-  };
+  const {
+    data: operationalData,
+    isLoading: isOperationalLoading,
+    error: operationalError,
+  } = useGetKpisQuery();
+  const {
+    data: productData,
+    isLoading: isProductLoading,
+    error: productError,
+  } = useGetProductsQuery();
 
   // Memoize operational expenses to prevent unnecessary re-renders
   const operationalExpenses = useMemo(() => {
@@ -77,7 +77,10 @@ const Row2 = () => {
     <>
       {/* DashboardBox for Operational vs Non-Operational Expenses chart */}
       <DashboardBox gridArea="d">
-        <LoadingWrapper fetchData={fetchData}>
+        <LoadingWrapper
+          isLoading={isOperationalLoading || isProductLoading}
+          error={operationalError || productError}
+        >
           <BoxHeader
             title="Operational vs Non-Operational Expenses"
             sideText="+4%" // Display a change percentage
@@ -134,7 +137,10 @@ const Row2 = () => {
 
       {/* DashboardBox for Campaign and Targets */}
       <DashboardBox gridArea="e">
-        <LoadingWrapper fetchData={fetchData}>
+        <LoadingWrapper
+          isLoading={isOperationalLoading || isProductLoading}
+          error={operationalError || productError}
+        >
           <BoxHeader title="Campaign and Targets" sideText="+4%" />
           <Flexbetween mt="0.25rem" gap="1.5rem" pr="1rem">
             {/* Pie chart displaying some data */}
@@ -165,7 +171,11 @@ const Row2 = () => {
             {/* Text displaying target sales and related info */}
             <Box ml="-0.7rem" flexBasis="40%" textAlign="center">
               <Typography variant="h5">Target Sales</Typography>
-              <Typography m="0.4rem 0" variant="h3" color={palette.primary[300]}>
+              <Typography
+                m="0.4rem 0"
+                variant="h3"
+                color={palette.primary[300]}
+              >
                 83 {/* Display target sales value */}
               </Typography>
               <Typography variant="h6" color={palette.grey[600]}>
@@ -188,7 +198,10 @@ const Row2 = () => {
 
       {/* DashboardBox for Product Prices vs Expenses scatter chart */}
       <DashboardBox gridArea="f">
-        <LoadingWrapper fetchData={fetchData}>
+        <LoadingWrapper
+          isLoading={isOperationalLoading || isProductLoading}
+          error={operationalError || productError}
+        >
           <BoxHeader title="Product Prices vs Expenses" sideText="+4%" />
           {/* Responsive container for the scatter chart */}
           <ResponsiveContainer width="100%" height="100%">
@@ -219,7 +232,8 @@ const Row2 = () => {
                 style={{ fontSize: "12px" }}
                 tickFormatter={(v) => `$${v}`} // Format the expense with a dollar sign
               />
-              <Tooltip formatter={(v) => `$${v}`} /> {/* Tooltip for expenses */}
+              <Tooltip formatter={(v) => `$${v}`} />{" "}
+              {/* Tooltip for expenses */}
               {/* Scatter plot showing product price vs expense data */}
               <Scatter
                 name="Product Expense Ratio"
