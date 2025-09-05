@@ -1,4 +1,4 @@
-import React, { useState, useEffect, ReactNode } from "react";
+import React, { ReactNode } from "react";
 import spinner from "@/assets/spinner.gif"; // Importing the spinner GIF for the loading animation
 
 interface LoadingWrapperProps {

@@ -145,6 +145,30 @@ const Row3 = () => {
               hideFooter={true} // Hide the footer
               rows={productData || []} // Display product data or empty if undefined
               columns={productColumns} // Use defined columns for the table
+              disableColumnMenu
+              componentsProps={{
+                basePopper: {
+                  sx: {
+                    "& .MuiDataGrid-menu": {
+                      // Fix for accessibility
+                      "& .MuiPaper-root": {
+                        color: palette.grey[300],
+                      },
+                    },
+                  },
+                },
+              }}
+              sx={{
+                "& .MuiDataGrid-virtualScroller": {
+                  // Fix for scrollbar accessibility
+                  "&:focus": {
+                    outline: "none !important",
+                  },
+                  "& .MuiDataGrid-virtualScrollerContent": {
+                    visibility: "visible !important",
+                  },
+                },
+              }}
             />
           </Box>
         </LoadingWrapper>
